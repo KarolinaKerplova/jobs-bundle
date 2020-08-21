@@ -1,0 +1,40 @@
+[tool.poetry]
+name = "jobs-bundle"
+version = "0.1.0"
+description = "Databricks jobs management bundle for the Bricksflow Framework"
+readme = "README.md"
+repository = "https://github.com/bricksflow/jobs-bundle"
+
+license = "MIT"
+
+authors = [
+    "Jiri Koutny <jiri.koutny@datasentics.com>"
+]
+
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+include = ["*.yaml"]
+
+packages = [
+    { include = "jobsbundle", from = "src" },
+]
+
+[tool.poetry.dependencies]
+python = "~3.7.3"
+injecta = ">=0.7"
+pyfony-bundles = "0.2.*"
+console-bundle = "0.2.*"
+databricks-api = "0.3.*"
+pygit2 = "0.28.*"
+
+[tool.poetry.dev-dependencies]
+pylint = "2.4.*"
+pyfony = "0.5.*"
+pytest = "5.2.*"
+
+[app]
+container-init = ["jobsbundle.containerInit", "initContainer"]

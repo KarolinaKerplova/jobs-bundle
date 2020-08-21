@@ -1,0 +1,37 @@
+parameters:
+  jobsbundle:
+    databricks:
+    templates:
+    jobs:
+
+services:
+  jobsbundle.git.CurrentBranchResolver:
+
+  jobsbundle.git.CurrentRepositoryFactory:
+
+  jobsbundle.databricksApi:
+    class: databricks_api.databricks.DatabricksAPI
+    autowire: False
+    arguments:
+      host: '%jobsbundle.databricks.host%'
+      token: '%jobsbundle.databricks.token%'
+
+  jobsbundle.job.ValuesFiller:
+    arguments:
+      - '@jobsbundle.git.CurrentBranchResolver'
+
+  jobsbundle.job.JobCreatorCommand:
+    arguments:
+      - '%jobsbundle.jobs%'
+      - '@consolebundle.logger'
+      - '@jobsbundle.databricksApi'
+    tags:
+      - 'console.command'
+
+  jobsbundle.job.JobCreateOrUpdateCommand:
+    arguments:
+      - '%jobsbundle.jobs%'
+      - '@consolebundle.logger'
+      - '@jobsbundle.databricksApi'
+    tags:
+      - 'console.command'

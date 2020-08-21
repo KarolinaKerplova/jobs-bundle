@@ -1,0 +1,21 @@
+parameters:
+  jobsbundle:
+    databricks:
+      host: ''
+      token: ''
+
+    templates:
+      default:
+        name: '{identifier} (%kernel.environment%)'
+
+        new_cluster:
+          spark_version: '6.5.x-scala2.11'
+          node_type_id: '{nodeType}'
+        notebook_task:
+          notebook_path: '/my-project_{currentBranch}/main'
+
+    jobs:
+      main:
+        template: '%jobsbundle.templates.default%'
+        values:
+          nodeType: 'i3.2xlarge'
