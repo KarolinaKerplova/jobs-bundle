@@ -35,3 +35,17 @@ services:
       - '@jobsbundle.databricksApi'
     tags:
       - 'console.command'
+
+  jobsbundle.job.StreamingJobCreateOrUpdateCommand:
+    arguments:
+      - '%jobsbundle.jobs%'
+      - '@consolebundle.logger'
+      - '@jobsbundle.databricksApi'
+    tags:
+      - 'console.command'
+
+  jobsbundle.job.JobIdFinder:
+    arguments:
+      - '@consolebundle.logger'
+      - '@jobsbundle.databricksApi'
+    

@@ -7,7 +7,7 @@ from databricks_api.databricks import DatabricksAPI
 from jobsbundle.job.JobIdFinder import JobIdFinder
 
 
-class JobCreateOrUpdateCommand(ConsoleCommand):
+class StreamingJobCreateOrUpdateCommand(ConsoleCommand):
 
     def __init__(
         self,
@@ -24,10 +24,10 @@ class JobCreateOrUpdateCommand(ConsoleCommand):
         self.__jobIdFinder = jobIdFinder
 
     def getCommand(self) -> str:
-        return 'databricks:job:create-or-update'
+        return 'databricks:job:streaming-create-or-update'
 
     def getDescription(self):
-        return 'Create new or update existing Databricks job based on given job identifier'
+        return 'Creates new or updates existing Databricks streaming job based on given job identifier and cancels the active run if exists'
 
     def configure(self, argumentParser: ArgumentParser):
         argumentParser.add_argument(dest='identifier', help='Job identifier')
@@ -52,7 +52,22 @@ class JobCreateOrUpdateCommand(ConsoleCommand):
             self.__logger.info(f'Existing job found with ID: {jobId}, updating')
             self.__dbxApi.jobs.reset_job(jobId, jobConfig.to_dict())
             self.__logger.info(f'Job successfully updated')
+            self.__cancelActiveRun(jobId)
         else:
             self.__logger.info(f'No existing job with name "{jobConfig.name}" found, creating new one')
             jobId = self.__dbxApi.jobs.create_job(**jobConfig.to_dict())['job_id']
             self.__logger.info(f'Job with ID {jobId} successfully created')
+
+        self.__dbxApi.jobs.run_now(jobId)
+        self.__logger.info(f'Job with ID {jobId} successfully run')
+
+    def __cancelActiveRun(self, jobId: str):
+        self.__logger.info('Looking for active runs...')
+        runsActive = self.__dbxApi.jobs.list_runs(job_id=jobId, active_only=True)
+        if 'runs' in runsActive:
+            for run in runsActive['runs']:
+                run_id = run['run_id']
+                self.__dbxApi.jobs.cancel_run(run_id=run_id)
+                self.__logger.info(f'Run {run_id} canceled')
+        else:
+            self.__logger.info('No active run exists')
