@@ -1,6 +1,7 @@
 from argparse import ArgumentParser, Namespace
 from logging import Logger
 from box import Box
+import time
 from consolebundle.ConsoleCommand import ConsoleCommand
 from jobsbundle.job.ValuesFiller import ValuesFiller
 from databricks_api.databricks import DatabricksAPI
@@ -64,10 +65,13 @@ class StreamingJobCreateOrUpdateCommand(ConsoleCommand):
     def __cancelActiveRun(self, jobId: str):
         self.__logger.info('Looking for active runs...')
         runsActive = self.__dbxApi.jobs.list_runs(job_id=jobId, active_only=True)
-        if 'runs' in runsActive:
+        while 'runs' in runsActive:
             for run in runsActive['runs']:
                 run_id = run['run_id']
                 self.__dbxApi.jobs.cancel_run(run_id=run_id)
                 self.__logger.info(f'Run {run_id} canceled')
+
+                time.sleep(5)
+                runsActive = self.__dbxApi.jobs.list_runs(job_id=jobId, active_only=True)
         else:
             self.__logger.info('No active run exists')
