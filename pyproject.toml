@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "jobs-bundle"
-version = "0.1.1"
+version = "0.1.2"
 description = "Databricks jobs management bundle for the Bricksflow Framework"
 readme = "README.md"
 repository = "https://github.com/bricksflow/jobs-bundle"
