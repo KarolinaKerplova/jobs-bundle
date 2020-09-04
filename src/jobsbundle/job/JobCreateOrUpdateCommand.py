@@ -5,6 +5,7 @@ from consolebundle.ConsoleCommand import ConsoleCommand
 from jobsbundle.job.ValuesFiller import ValuesFiller
 from databricks_api.databricks import DatabricksAPI
 from jobsbundle.job.JobIdFinder import JobIdFinder
+from jobsbundle.job.JobPermissionUpdater import JobPermissionUpdater
 
 
 class JobCreateOrUpdateCommand(ConsoleCommand):
@@ -15,13 +16,15 @@ class JobCreateOrUpdateCommand(ConsoleCommand):
         logger: Logger,
         dbxApi: DatabricksAPI,
         valuesFiller: ValuesFiller,
-        jobIdFinder: JobIdFinder
+        jobIdFinder: JobIdFinder,
+        permissionUpdater: JobPermissionUpdater
     ):
         self.__jobsRawConfig = jobsRawConfig
         self.__logger = logger
         self.__dbxApi = dbxApi
         self.__valuesFiller = valuesFiller
         self.__jobIdFinder = jobIdFinder
+        self.__permissionUpdater = permissionUpdater
 
     def getCommand(self) -> str:
         return 'databricks:job:create-or-update'
@@ -43,7 +46,6 @@ class JobCreateOrUpdateCommand(ConsoleCommand):
             jobRawConfig['values'],
             inputArgs.identifier
         )
-
         self.__logger.info(f'Looking for job with name "{jobConfig.name}"')
 
         jobId = self.__jobIdFinder.find(jobConfig.name)
@@ -56,3 +58,6 @@ class JobCreateOrUpdateCommand(ConsoleCommand):
             self.__logger.info(f'No existing job with name "{jobConfig.name}" found, creating new one')
             jobId = self.__dbxApi.jobs.create_job(**jobConfig.to_dict())['job_id']
             self.__logger.info(f'Job with ID {jobId} successfully created')
+
+        if 'permission' in jobRawConfig:
+            self.__permissionUpdater.run(jobRawConfig['permission'], jobId)

@@ -3,6 +3,8 @@ parameters:
     databricks:
       host: ''
       token: ''
+      notifications:
+        on_failure: []
 
     templates:
       default:
@@ -14,8 +16,13 @@ parameters:
         notebook_task:
           notebook_path: '/my-project_{currentBranch}/main'
 
+      permissionsDefault:
+        usersNames: '%jobsbundle.databricks.notifications.on_failure%'
+        permissionLevel: 'CAN_MANAGE'
+
     jobs:
       main:
         template: '%jobsbundle.templates.default%'
         values:
           nodeType: 'i3.2xlarge'
+        permission: '%jobsbundle.templates.permissionsDefault%'

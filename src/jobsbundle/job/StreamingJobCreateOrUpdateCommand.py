@@ -6,6 +6,7 @@ from consolebundle.ConsoleCommand import ConsoleCommand
 from jobsbundle.job.ValuesFiller import ValuesFiller
 from databricks_api.databricks import DatabricksAPI
 from jobsbundle.job.JobIdFinder import JobIdFinder
+from jobsbundle.job.JobPermissionUpdater import JobPermissionUpdater
 
 
 class StreamingJobCreateOrUpdateCommand(ConsoleCommand):
@@ -16,13 +17,15 @@ class StreamingJobCreateOrUpdateCommand(ConsoleCommand):
         logger: Logger,
         dbxApi: DatabricksAPI,
         valuesFiller: ValuesFiller,
-        jobIdFinder: JobIdFinder
+        jobIdFinder: JobIdFinder,
+        permissionUpdater: JobPermissionUpdater
     ):
         self.__jobsRawConfig = jobsRawConfig
         self.__logger = logger
         self.__dbxApi = dbxApi
         self.__valuesFiller = valuesFiller
         self.__jobIdFinder = jobIdFinder
+        self.__permissionUpdater = permissionUpdater
 
     def getCommand(self) -> str:
         return 'databricks:job:streaming-create-or-update'
@@ -61,6 +64,9 @@ class StreamingJobCreateOrUpdateCommand(ConsoleCommand):
 
         self.__dbxApi.jobs.run_now(jobId)
         self.__logger.info(f'Job with ID {jobId} successfully run')
+
+        if 'permission' in jobRawConfig:
+            self.__permissionUpdater.run(jobRawConfig['permission'], jobId)
 
     def __cancelActiveRun(self, jobId: str):
         self.__logger.info('Looking for active runs...')

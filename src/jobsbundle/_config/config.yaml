@@ -44,8 +44,13 @@ services:
     tags:
       - 'console.command'
 
+  jobsbundle.job.JobPermissionUpdater:
+    arguments:
+      - '@consolebundle.logger'
+      - '%jobsbundle.databricks.host%'
+      - '%jobsbundle.databricks.token%'
+
   jobsbundle.job.JobIdFinder:
     arguments:
       - '@consolebundle.logger'
       - '@jobsbundle.databricksApi'
-    
