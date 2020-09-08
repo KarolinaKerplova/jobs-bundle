@@ -45,7 +45,7 @@ class JobPermissionUpdater:
         return requests.get(url, headers=auth)
 
     def __createUrl(self, jobId):
-        return f'{self.__host}api/2.0/preview/permissions/jobs/{jobId}'
+        return f'{self.__host}/api/2.0/preview/permissions/jobs/{jobId}'
 
     def __createAuth(self):
         return {'Authorization': f'Bearer {self.__token}'}

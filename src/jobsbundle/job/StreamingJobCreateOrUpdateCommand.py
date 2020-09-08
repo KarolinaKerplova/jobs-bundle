@@ -73,11 +73,10 @@ class StreamingJobCreateOrUpdateCommand(ConsoleCommand):
         runsActive = self.__dbxApi.jobs.list_runs(job_id=jobId, active_only=True)
         while 'runs' in runsActive:
             for run in runsActive['runs']:
-                run_id = run['run_id']
-                self.__dbxApi.jobs.cancel_run(run_id=run_id)
-                self.__logger.info(f'Run {run_id} canceled')
+                runId = run['run_id']
+                self.__dbxApi.jobs.cancel_run(run_id=runId)
+                self.__logger.info(f'Run {runId} canceled')
 
                 time.sleep(5)
                 runsActive = self.__dbxApi.jobs.list_runs(job_id=jobId, active_only=True)
-        else:
-            self.__logger.info('No active run exists')
+        self.__logger.info('No active run exists')
